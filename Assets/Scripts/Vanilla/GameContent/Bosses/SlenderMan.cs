@@ -345,7 +345,7 @@ namespace MVZ2.GameContent.Bosses
             var contraptions = level.FindEntities(e => e.Type == EntityTypes.PLANT && e.IsHostile(boss) && e.CanDeactive());
             foreach (var contraption in contraptions)
             {
-                contraption.ShortCircuit(600, new EntitySourceReference(boss));
+                contraption.ShortCircuit(300, new EntitySourceReference(boss));
             }
             //level.AddBuff<SlendermanDisableBuff>();
         }
@@ -433,38 +433,31 @@ namespace MVZ2.GameContent.Bosses
             //尸潮：额外加入其他类僵尸
             boss.PlaySound(VanillaSoundID.biohazard);
             boss.PlaySound(VanillaSoundID.nightmarePortal);
-
             var level = boss.Level;
-            var rng = GetEventRNG(boss);
-            var enemyTypes = new NamespaceID[]
+
+            // 创建随机敌人池  
+            var enemyPool = new NamespaceID[]
             {
-                VanillaEnemyID.mummy,
-                VanillaEnemyID.ironHelmettedZombie,
-                VanillaEnemyID.gargoyle
+        VanillaEnemyID.HostZombie,
+        VanillaEnemyID.ironHelmettedZombie,
+        VanillaEnemyID.gargoyle
             };
+            var rng = GetEventRNG(boss); // 或使用boss已有的RNG  
 
-            int maxColumn = level.GetMaxColumnCount();
-            int startColumn = Mathf.Max(0, maxColumn - 3);
-
-            for (int lane = 0; lane < level.GetMaxLaneCount(); lane++)
+            for (int column = 0; column < 2; column++)
             {
-                for (int column = startColumn; column < maxColumn; column++)
+                float x = level.GetEntityColumnX(level.GetMaxColumnCount() - 1 - column);
+                for (int lane = 0; lane < level.GetMaxLaneCount(); lane++)
                 {
-                    float x = level.GetEntityColumnX(column);
-                    float z = level.GetEntityLaneZ(lane);
-                    float y = level.GetGroundY(x, z);
+                    var z = level.GetEntityLaneZ(lane);
+                    var y = level.GetGroundY(x, z);
                     Vector3 pos = new Vector3(x, y, z);
+                    var randomEnemy = enemyPool.Random(rng);
+                    SpawnPortal(boss, pos, randomEnemy);
 
-                    var enemyID = enemyTypes[column % 3];
-                    SpawnEntityWithBoat(boss, pos, lane, enemyID)?.Let(e =>
-                    {
-                        if (column % 3 == 0)
-                        {
-                            e.AddBuff<AttackSpeedBuff>();
-                        }
-                    });
                 }
             }
+
         }
 
         private void TheLurker(Entity boss)
@@ -561,7 +554,7 @@ namespace MVZ2.GameContent.Bosses
 
         private void BigBang(Entity boss)
         {
-            //bigbang：随机器械发生爆炸，伤害敌对阵营
+            //bigbang：随机器械发生爆炸，仅伤害同阵营器械
             boss.PlaySound(VanillaSoundID.smash);
 
             var level = boss.Level;
@@ -589,7 +582,7 @@ namespace MVZ2.GameContent.Bosses
                     target.Position,
                     range,
                     boss.GetFaction(),
-                    2300,
+                    200,
                     damageEffects
                 );
 
@@ -679,8 +672,8 @@ namespace MVZ2.GameContent.Bosses
         private static string GetFateOptionText(RandomGenerator rng, int option)
         {
             var index = Array.IndexOf(fateOptions, option);
-            int randomInt = rng.Next(0, 13);
-            string text = randomInt < 12 ? fateTexts[index] : "???";
+            int randomInt = rng.Next(0, 7);
+            string text = randomInt < 5 ? fateTexts[index] : "???";
             return Global.Localization.GetText(text);
         }
         #endregion
