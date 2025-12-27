@@ -345,7 +345,7 @@ namespace MVZ2.GameContent.Bosses
             var contraptions = level.FindEntities(e => e.Type == EntityTypes.PLANT && e.IsHostile(boss) && e.CanDeactive());
             foreach (var contraption in contraptions)
             {
-                contraption.ShortCircuit(10, new EntitySourceReference(boss));
+                contraption.ShortCircuit(600, new EntitySourceReference(boss));
             }
             //level.AddBuff<SlendermanDisableBuff>();
         }
@@ -443,9 +443,12 @@ namespace MVZ2.GameContent.Bosses
                 VanillaEnemyID.gargoyle
             };
 
+            int maxColumn = level.GetMaxColumnCount();
+            int startColumn = Mathf.Max(0, maxColumn - 3);
+
             for (int lane = 0; lane < level.GetMaxLaneCount(); lane++)
             {
-                for (int column = 0; column < level.GetMaxColumnCount(); column++)
+                for (int column = startColumn; column < maxColumn; column++)
                 {
                     float x = level.GetEntityColumnX(column);
                     float z = level.GetEntityLaneZ(lane);
@@ -558,7 +561,7 @@ namespace MVZ2.GameContent.Bosses
 
         private void BigBang(Entity boss)
         {
-            //bigbang：随机器械发生爆炸，仅伤害同阵营器械
+            //bigbang：随机器械发生爆炸，伤害敌对阵营
             boss.PlaySound(VanillaSoundID.smash);
 
             var level = boss.Level;
@@ -586,7 +589,7 @@ namespace MVZ2.GameContent.Bosses
                     target.Position,
                     range,
                     boss.GetFaction(),
-                    200,
+                    2300,
                     damageEffects
                 );
 
