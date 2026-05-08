@@ -122,6 +122,7 @@ namespace MVZ2.GameContent.Buffs
             public const string Resistance = "Resistance";
             public const string ExplosionProtection = "ExplosionProtection";
             public const string DeathMark = "DeathMark";
+            public const string squidDrownedMarked = "squid_drowned_marked";
         }
         public static class Armor
         {
@@ -449,6 +450,7 @@ namespace MVZ2.GameContent.Buffs
             
             public static readonly NamespaceID Regeneration = Get(VanillaBuffNames.Entity.Regeneration);
             public static readonly NamespaceID Corropoison = Get(VanillaBuffNames.Entity.Corropoison);
+            public static readonly NamespaceID squidDrownedMarked = Get(VanillaBuffNames.Entity.squidDrownedMarked);
             public static readonly NamespaceID DeathMark = Get(VanillaBuffNames.Entity.DeathMark);
 
             // Chapter 2
